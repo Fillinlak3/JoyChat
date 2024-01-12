@@ -41,6 +41,7 @@
             PANEL_Chat = new Panel();
             PANEL_Chat_Messages = new Panel();
             panel2 = new Panel();
+            label2 = new Label();
             textBox2 = new TextBox();
             panel1 = new Panel();
             label1 = new Label();
@@ -49,9 +50,8 @@
             LABEL_Chat_FriendName = new Label();
             pictureBox3 = new PictureBox();
             PANEL_Chat_Bottom = new Panel();
-            TB_SendMessage = new TextBox();
-            label2 = new Label();
             pictureBox2 = new PictureBox();
+            TB_SendMessage = new TextBox();
             PANEL_LeftSide.SuspendLayout();
             PANEL_LeftSide_Top_Menu.SuspendLayout();
             PANEL_TB_Placeholder.SuspendLayout();
@@ -200,6 +200,18 @@
             panel2.Size = new Size(1042, 100);
             panel2.TabIndex = 1;
             // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.BackColor = Color.FromArgb(0, 92, 75);
+            label2.Font = new Font("Cambria", 7.8F, FontStyle.Regular, GraphicsUnit.Point);
+            label2.ForeColor = Color.White;
+            label2.Location = new Point(940, 50);
+            label2.Name = "label2";
+            label2.Size = new Size(52, 15);
+            label2.TabIndex = 5;
+            label2.Text = "1:11 PM";
+            // 
             // textBox2
             // 
             textBox2.BackColor = Color.FromArgb(0, 92, 75);
@@ -291,6 +303,14 @@
             PANEL_Chat_Bottom.Size = new Size(1042, 80);
             PANEL_Chat_Bottom.TabIndex = 0;
             // 
+            // pictureBox2
+            // 
+            pictureBox2.Location = new Point(962, 0);
+            pictureBox2.Name = "pictureBox2";
+            pictureBox2.Size = new Size(80, 80);
+            pictureBox2.TabIndex = 2;
+            pictureBox2.TabStop = false;
+            // 
             // TB_SendMessage
             // 
             TB_SendMessage.BackColor = Color.FromArgb(42, 57, 66);
@@ -299,6 +319,7 @@
             TB_SendMessage.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
             TB_SendMessage.ForeColor = Color.White;
             TB_SendMessage.Location = new Point(140, 20);
+            TB_SendMessage.MaxLength = int.MaxValue;
             TB_SendMessage.Multiline = true;
             TB_SendMessage.Name = "TB_SendMessage";
             TB_SendMessage.PlaceholderText = "Type a message";
@@ -306,26 +327,6 @@
             TB_SendMessage.TabIndex = 1;
             TB_SendMessage.TabStop = false;
             TB_SendMessage.TextChanged += WriteMessage;
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.BackColor = Color.FromArgb(0, 92, 75);
-            label2.Font = new Font("Cambria", 7.8F, FontStyle.Regular, GraphicsUnit.Point);
-            label2.ForeColor = Color.White;
-            label2.Location = new Point(940, 50);
-            label2.Name = "label2";
-            label2.Size = new Size(52, 15);
-            label2.TabIndex = 5;
-            label2.Text = "1:11 PM";
-            // 
-            // pictureBox2
-            // 
-            pictureBox2.Location = new Point(962, 0);
-            pictureBox2.Name = "pictureBox2";
-            pictureBox2.Size = new Size(80, 80);
-            pictureBox2.TabIndex = 2;
-            pictureBox2.TabStop = false;
             // 
             // JoyChat
             // 

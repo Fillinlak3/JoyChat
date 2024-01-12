@@ -3,6 +3,7 @@ using Microsoft.VisualBasic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace JoyChat.Forms.Main
 {
@@ -70,40 +71,66 @@ namespace JoyChat.Forms.Main
             List<Panel> message_lines = new List<Panel>();
             foreach (var message in conversation.Messages)
             {
+                Panel message_line = new Panel();
+                message_line.Dock = DockStyle.Top;
+                message_line.Name = "panel1";
+                message_line.Padding = new Padding(5);
+                message_line.TabIndex = 0;
+
                 Label timeStamp = new Label();
                 timeStamp.AutoSize = true;
                 timeStamp.BackColor = Color.FromArgb(32, 44, 51);
                 timeStamp.Font = new Font("Cambria", 7.8F, FontStyle.Regular, GraphicsUnit.Point);
                 timeStamp.ForeColor = Color.White;
-                timeStamp.TabIndex = 3;
+                timeStamp.TabIndex = 2;
                 timeStamp.Text = message.TimeStamp.ToString("h:mm tt");
 
                 TextBox message_text = new TextBox();
                 message_text.BorderStyle = BorderStyle.None;
                 message_text.Font = new Font("Cambria", 10.2F, FontStyle.Regular, GraphicsUnit.Point);
                 message_text.ForeColor = Color.White;
+                message_text.AutoSize = true;
                 message_text.Multiline = true;
+                message_text.WordWrap = true;
                 message_text.ReadOnly = true;
-                message_text.TabIndex = 2;
+                message_text.TabIndex = 1;
+                message_text.TabStop = false;
                 message_text.Text = message.Text;
 
-                // Make the textbox change its size based on number of chars.
-                // Default values.
-                int textbox_width = (int)message_text.Font.Size + 50;
-                int textbox_height = TextRenderer.MeasureText(message_text.Text, message_text.Font, new Size(message_text.Width, int.MaxValue), TextFormatFlags.WordBreak).Height;
-                // Adapt the width and height of the textbox to fit it's elements.
-                if (message_text.Text.Length <= 80) textbox_width += message_text.Text.Where(c => !char.IsWhiteSpace(c)).ToArray().Length * (int)message_text.Font.Size;
-                else textbox_width += 81 * (int)message_text.Font.Size;
+                // Make the textbox change its size dynamically based on number of chars.
+                int prefferedWidth = Math.Min(700, TextRenderer.MeasureText(message.Text, message_text.Font).Width + timeStamp.Width); // You might want to use a fixed width or adjust as needed
+                int preferredHeight = 0;
+                {
+                    // Split the text by newline character
+                    string[] lines = message.Text.Split('\n');
 
-                // Update the size.
-                message_text.Size = new Size(textbox_width, textbox_height);
+                    int wordwrapOverridedLines = 0;
+                    /* 
+                        If there are lines that go over 80 chars, then those are word-wrap overrided lines
+                        so, for each of these lines we need to keep track of how many lines were `used` by
+                        the word-wrap to fit the text. Those lines are not considered in `.Lines` property.
+                        Those lines are just the word-wrap overlapping which I keep track of with this loop.
+                     */
+                    foreach (var line in lines.Where(line => line.Length >= 80))
+                        // Take the absolute value of occurrence and add it.
+                        wordwrapOverridedLines += (int)Math.Abs((double)prefferedWidth / line.Length);
 
-                Panel message_line = new Panel();
-                message_line.Dock = DockStyle.Top;
-                message_line.Name = "panel1";
+                    /*
+                        So, after all when we found out on how many lines did the word wrap extend to fit the
+                        text string, we add them to the real line count of the string.
+                        In conclusion, what we know to be a string line is the entire, but a word-wrap
+                        overrided line is the one that is concluded by the word-wrapper working around to fit
+                        the text on `multiple lines` which aren't real lines counted in `.Lines` property.
+                     */
+                    int lineCount = lines.Length + wordwrapOverridedLines;
+                    preferredHeight = (int)(message_text.Font.GetHeight() * lineCount) + message_line.Padding.Vertical;
+                }
+                // Setting size for the TextBox
+                message_text.Size = new Size(prefferedWidth, preferredHeight);
+
+                // Idee sa se vada cate caractere sunt pe linie dupa care sa se adune inaltimea cu cate o linie pana se fac nr de char.
                 int panel_height = 5 + message_text.Height;
-                message_line.Size = new Size(1042, panel_height);
-                message_line.TabIndex = 0;
+                message_line.Size = new Size(1042, preferredHeight + message_line.Padding.Vertical);
 
                 // If the message is `received` (GRAY)
                 if (message.SenderName == currentUser.Username)
@@ -158,7 +185,20 @@ namespace JoyChat.Forms.Main
 
         private void WriteMessage(object sender, EventArgs e)
         {
-            int multiplier = (int)Math.Abs((double)TB_SendMessage.Text.Length / 81) + 1;
+            static int CalculateCharactersPerLine(TextBox textBox)
+            {
+                using (Graphics g = textBox.CreateGraphics())
+                {
+                    Font font = textBox.Font;
+                    SizeF charSize = g.MeasureString("A", font); // Measure the width of a single character
+
+                    int width = (int)textBox.Width; // Width of the RichTextBox
+                    int charactersPerLine = (int)(width / charSize.Width); // Calculate characters per line
+                    return charactersPerLine * 2 + 1;
+                }
+            }
+
+            int multiplier = (int)Math.Abs((double)TB_SendMessage.Text.Length / CalculateCharactersPerLine(TB_SendMessage)) + 1;
             if (multiplier < 3) TB_SendMessage.ScrollBars = ScrollBars.None;
             else
             {
@@ -208,7 +248,7 @@ namespace JoyChat.Forms.Main
                 }
             });
 
-            TB_SendMessage.Width = (int)Math.Round((double)PANEL_Chat_Bottom.Width / 1.2);
+            TB_SendMessage.Width = (int)Math.Round((double)PANEL_Chat_Bottom.Width / 1.2) - pictureBox2.Width;
             pictureBox2.Location = new Point(PANEL_Chat_Bottom.Width - pictureBox2.Width, pictureBox2.Location.Y);
 
             PANEL_Chat_Messages.ResumeLayout();
