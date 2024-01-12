@@ -128,8 +128,6 @@ namespace JoyChat.Forms.Main
                 // Setting size for the TextBox
                 message_text.Size = new Size(prefferedWidth, preferredHeight);
 
-                // Idee sa se vada cate caractere sunt pe linie dupa care sa se adune inaltimea cu cate o linie pana se fac nr de char.
-                int panel_height = 5 + message_text.Height;
                 message_line.Size = new Size(1042, preferredHeight + message_line.Padding.Vertical);
 
                 // If the message is `received` (GRAY)
@@ -139,7 +137,7 @@ namespace JoyChat.Forms.Main
                     message_text.Location = new Point(50, 5);
                     message_text.Name = "message_receive";
                     timeStamp.BackColor = Color.FromArgb(32, 44, 51);
-                    timeStamp.Location = new Point(message_text.Width - 5, panel_height - 15);
+                    timeStamp.Location = new Point(message_text.Width - 5, message_line.Height - 20);
                     timeStamp.Name = "timestamp_receive";
                 }
                 // else if the message is `sent` (GREEN)
@@ -149,7 +147,7 @@ namespace JoyChat.Forms.Main
                     message_text.Location = new Point(PANEL_Chat.Width - message_text.Width - 50, 5);
                     message_text.Name = "message_sent";
                     timeStamp.BackColor = Color.FromArgb(0, 92, 75);
-                    timeStamp.Location = new Point(PANEL_Chat.Width - 50 - 55, panel_height - 15);
+                    timeStamp.Location = new Point(PANEL_Chat.Width - 50 - 55, message_line.Height - 20);
                     timeStamp.Name = "timestamp_sent";
                 }
 
@@ -253,6 +251,7 @@ namespace JoyChat.Forms.Main
 
             PANEL_Chat_Messages.ResumeLayout();
             PANEL_Chat.Update();
+            await Task.Delay(100);
         }
     }
 }
