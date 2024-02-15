@@ -10,6 +10,9 @@ namespace JoyChat.Classes
 {
     internal class Account
     {
+        /// <summary>
+        /// Returns a json containing the user's credentials for registering.
+        /// </summary>
         static public string Save(User user)
         {
             string json = string.Empty;
@@ -38,6 +41,9 @@ namespace JoyChat.Classes
             return json;
         }
 
+        /// <summary>
+        /// Returns an User instance for login.
+        /// </summary>
         static public User Get(string json)
         {
             if (string.IsNullOrWhiteSpace(json))

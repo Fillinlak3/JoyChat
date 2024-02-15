@@ -96,6 +96,12 @@ namespace JoyChat.Forms.Main
                 message_text.TabIndex = 1;
                 message_text.TabStop = false;
                 message_text.Text = message.Text;
+                // Allow scrolling entire conversation when hovering the message.
+                message_text.MouseWheel += (sender, e) =>
+                {
+                    PANEL_Chat_Messages.AutoScrollPosition = 
+                    new Point(0, PANEL_Chat_Messages.VerticalScroll.Value - (e.Delta > 0 ? 50 : -50));
+                };
 
                 // Make the textbox change its size dynamically based on number of chars.
                 int prefferedWidth = Math.Min(700, TextRenderer.MeasureText(message.Text, message_text.Font).Width + timeStamp.Width); // You might want to use a fixed width or adjust as needed
@@ -169,7 +175,7 @@ namespace JoyChat.Forms.Main
                 PANEL_Chat_Messages.Controls.Add(message);
 
             PANEL_Chat_Messages.AutoScrollPosition = new Point(0, PANEL_Chat_Messages.VerticalScroll.Maximum);
-
+            
             message_lines.Clear();
             message_lines = null;
 
@@ -178,9 +184,9 @@ namespace JoyChat.Forms.Main
             PANEL_Chat.Visible = true;
         }
 
-        [DllImport("dwmapi.dll", PreserveSig = true)]
-        public static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref bool attrValue, int attrSize);
-
+        /// <summary>
+        /// Write into conversation's textbox.
+        /// </summary>
         private void WriteMessage(object sender, EventArgs e)
         {
             static int CalculateCharactersPerLine(TextBox textBox)
@@ -208,6 +214,9 @@ namespace JoyChat.Forms.Main
             TB_SendMessage.Size = new Size(TB_SendMessage.Width, adapt_height - 40);
         }
 
+        /// <summary>
+        /// Resize the form and it's elements inside to fit.
+        /// </summary>
         private async void UpdateControlsOnResize(object sender, EventArgs e)
         {
             PANEL_Chat_Messages.SuspendLayout();
@@ -253,5 +262,11 @@ namespace JoyChat.Forms.Main
             PANEL_Chat.Update();
             await Task.Delay(100);
         }
+
+        /// <summary>
+        /// For setting the form to light/dark mode.
+        /// </summary>
+        [DllImport("dwmapi.dll", PreserveSig = true)]
+        public static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref bool attrValue, int attrSize);
     }
 }
