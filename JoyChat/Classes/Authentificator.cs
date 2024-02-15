@@ -17,7 +17,7 @@ namespace JoyChat.Classes
     {
         private static readonly HttpClient HttpClient;
         private static readonly string GistId = @"41b6c0b21c6bc7f59468f3994e4f4fef";
-        private static readonly string AccessToken = @"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";
+        private static readonly string AccessToken = @"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";
         private static readonly string ApiUrl = $"https://api.github.com/gists/{GistId}";
 
         static Authentificator()
@@ -36,6 +36,13 @@ namespace JoyChat.Classes
 
                 if (response.IsSuccessStatusCode)
                 {
+                    int limit = int.Parse(response.Headers.GetValues("X-RateLimit-Limit").FirstOrDefault());
+                    int remaining = int.Parse(response.Headers.GetValues("X-RateLimit-Remaining").FirstOrDefault());
+                    DateTimeOffset resetTime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(response.Headers.GetValues("X-RateLimit-Reset").FirstOrDefault()));
+                    Debug.WriteLine($"[Authentificator-Gist-Read] Error reading Gist. Status Code: {response.StatusCode}");
+                    Debug.WriteLine($"[Authentificator-Gist-Read] More information: {await response.Content.ReadAsStringAsync()}");
+                    Debug.WriteLine($"Rate Limit: {limit}, Remaining: {remaining}, Reset Time: {resetTime}");
+
                     string jsonContent = await response.Content.ReadAsStringAsync();
 
                     // Parse the JSON using System.Text.Json.JsonSerializer
@@ -53,8 +60,13 @@ namespace JoyChat.Classes
                 }
                 else
                 {
+                    int limit = int.Parse(response.Headers.GetValues("X-RateLimit-Limit").FirstOrDefault());
+                    int remaining = int.Parse(response.Headers.GetValues("X-RateLimit-Remaining").FirstOrDefault());
+                    DateTimeOffset resetTime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(response.Headers.GetValues("X-RateLimit-Reset").FirstOrDefault()));
+
                     Debug.WriteLine($"[Authentificator-Gist-Read] Error reading Gist. Status Code: {response.StatusCode}");
                     Debug.WriteLine($"[Authentificator-Gist-Read] More information: {await response.Content.ReadAsStringAsync()}");
+                    Debug.WriteLine($"Rate Limit: {limit}, Remaining: {remaining}, Reset Time: {resetTime}");
                     throw new HttpRequestException($"Error reading the database. Status Code: {response.StatusCode}");
                 }
             }
